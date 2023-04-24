@@ -1,0 +1,49 @@
+---
+title: "HW10"
+author: "Nathan Catalano"
+date: "2023-04-24"
+output: html_document
+---
+
+github link: https://github.com/nathancatalano/HW10
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+acc <- read.csv("https://raw.githubusercontent.com/yumouqiu/DS202-Spring2023/main/Practice/data/fars2016/accident.csv", stringsAsFactors = FALSE)
+names(acc)
+```
+```{r}
+library(tidyverse)
+```
+
+```{r}
+acc %>% count(DAY_WEEK)
+```
+More accidents happen on Fridays and Saturdays than Wednesdays and Thursdays
+
+```{r}
+acc %>% count(HOUR) %>% arrange(desc(n))
+```
+Accidents are most common in the later hours of the day
+
+```{r}
+dacc = acc %>% filter(DRUNK_DR > 0)
+dim(dacc)
+```
+There are 8720 accidents with at least one drunk driver
+
+```{r}
+per<- read.csv("https://raw.githubusercontent.com/yumouqiu/DS202-Spring2023/main/Practice/data/fars2016/person.csv")
+```
+
+```{r}
+driver = per %>% filter(PER_TYP==1)
+```
+
+```{r}
+left_join(driver, acc, by="ST_CASE")
+```
+
