@@ -1,6 +1,6 @@
 ---
 title: "HW10"
-author: "Nathan Catalano"
+author: "Nathan Catalano & Brett Simmons"
 date: "2023-04-24"
 output: html_document
 ---
@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 acc <- read.csv("https://raw.githubusercontent.com/yumouqiu/DS202-Spring2023/main/Practice/data/fars2016/accident.csv", stringsAsFactors = FALSE)
 names(acc)
+acc %>% filter(LONGITUD < 0) %>% ggplot(aes(x = LONGITUD, y = LATITUDE)) + geom_point()
 ```
 ```{r}
 library(tidyverse)
@@ -44,6 +45,29 @@ driver = per %>% filter(PER_TYP==1)
 ```
 
 ```{r}
-left_join(driver, acc, by="ST_CASE")
+acc_driver = left_join(driver, acc, by="ST_CASE")
+```
+
+```{r}
+library(ggplot2)
+acc_driver$DAY_WEEK = factor(acc_driver$DAY_WEEK, labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+
+daily = acc_driver %>% group_by(DAY_WEEK) %>% summarise(ACCIDENTS = n())
+ 
+ggplot(daily,aes(x=DAY_WEEK,y=ACCIDENTS,fill=factor(DAY_WEEK))) + geom_bar(stat="identity") + scale_fill_brewer(palette="Set3") + labs(title = "Accidents by Day of the Week", x='', y="Number of Accidents") + theme(legend.position="none")
+
+```
+
+```{r}
+hourly = acc_driver %>% group_by(HOUR.x) %>% summarise(ACCIDENTS = n())
+hourly = filter(hourly, HOUR.x != 99)
+ggplot(hourly,aes(x=HOUR.x,y=ACCIDENTS)) + geom_line() + labs(title = "Accidents by Hour of the Day", x = "Hour of Day",y="Number of Accidents" )
+
+```
+
+```{r}
+gender = acc_driver %>% group_by(SEX) %>% summarise(ACCIDENTS = n())
+gender = filter(gender, SEX != 8 & SEX != 9)
+ggplot(gender,aes(x=SEX,y=ACCIDENTS,fill=factor(SEX))) + geom_bar(stat='identity')+scale_fill_manual(values = c("darkblue","darkred")) + labs(title = "Accidents by Gender", x = "Gender",y="Number of Accidents" )
 ```
 
